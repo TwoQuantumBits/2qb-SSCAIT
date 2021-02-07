@@ -25,6 +25,19 @@ public class Bot extends DefaultBWListener {
         }
     }
 
+    public void train(Player player)
+    {
+        for (Unit trainer : player.getUnits()) {
+            UnitType unitType = trainer.getType();
+            if (unitType.isBuilding() && !unitType.buildsWhat().isEmpty()) {
+                UnitType toTrain = unitType.buildsWhat().get(0);
+                if (game.canMake(toTrain, trainer)) {
+                    trainer.train(toTrain);
+                }
+            }
+        }
+    }
+
     public void printUnits(Player player)
     {
         int lineIndex = 40;
@@ -47,6 +60,7 @@ public class Bot extends DefaultBWListener {
         game.drawTextScreen(10, 20, "Resources: " + self.minerals() + " minerals,  " + self.gas() + " gas");
         game.drawTextScreen(10, 30, "Units:");
         printUnits(self);
+        train(self);
     }
 
     void run() {

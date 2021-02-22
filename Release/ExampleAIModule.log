@@ -1,0 +1,8 @@
+﻿  ExampleAIModule.cpp
+     Creating library Release\ExampleAIModule.lib and object Release\ExampleAIModule.exp
+  Generating code
+  934 of 2554 functions (36.6%) were compiled, the rest were copied from previous compilation.
+    74 functions were new in current compilation
+    174 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  ExampleAIModule.vcxproj -> C:\Users\Zap\BWAPI\Release\ExampleAIModule.dll

@@ -1,4 +1,4 @@
-#include "ExampleAIModule.h"
+#include "2qb-SSCAIT.h"
 #include <iostream>
 
 using namespace BWAPI;

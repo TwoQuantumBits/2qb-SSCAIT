@@ -92,10 +92,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Dll.cpp" />
-    <ClCompile Include="Source\ExampleAIModule.cpp" />
+    <ClCompile Include="Source\2qb-SSCAIT.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\ExampleAIModule.h" />
+    <ClInclude Include="Source\2qb-SSCAIT.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BWAPILIB\BWAPILIB.vcxproj">

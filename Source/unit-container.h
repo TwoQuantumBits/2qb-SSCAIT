@@ -29,7 +29,7 @@ public:
         }
     }
 protected:
-	virtual void Insert(Unit unit) = 0;
+    virtual void Insert(Unit unit) = 0;
     virtual void PerformTask(Unit u) = 0;
 };
 

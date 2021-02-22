@@ -5,6 +5,7 @@ using namespace Filter;
 
 class UnitContainer {
 public:
+
     std::unordered_set<Unit> unit_set;
     void OnFrame() {
         for (Unit u : unit_set) {
@@ -48,7 +49,7 @@ public:
 
 class WorkerContainer : public UnitContainer {
 public:
-    bool CheckType(Unit unit) override { return unit->getType().isWorker(); }
+    bool CheckType(Unit unit) override { return (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()); }
 private:
     void PerformTask(Unit u) override {
         // if our worker is idle
@@ -58,13 +59,13 @@ private:
             // otherwise find a mineral patch to harvest.
             if (u->isCarryingGas() || u->isCarryingMinerals())
             {
-                gatherer.DoneGathering(u);
                 u->returnCargo();
+                //gatherer.DoneGathering(u);
             }
             else if (!u->getPowerUp())  // The worker cannot harvest anything if it
             {                             // is carrying a powerup such as a flag
+                //u->gather(u->getClosestUnit(IsMineralField || IsRefinery));
                 gatherer.Gather(u);
-
             } // closure: has no powerup
         } // closure: if idle
     }
@@ -72,7 +73,7 @@ private:
 
 class ResourceDepotContainer : public UnitContainer {
 public:
-    bool CheckType(Unit unit) { return unit->getType().isResourceDepot(); }
+    bool CheckType(Unit unit) { return (unit->getType().isResourceDepot() && unit->getPlayer() == Broodwar->self()); }
 private:
     void PerformTask(Unit u) {
         // Order the depot to construct more workers! But only when it is idle.

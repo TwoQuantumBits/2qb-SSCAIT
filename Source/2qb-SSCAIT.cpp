@@ -9,8 +9,8 @@ MineGather gatherer;
 using namespace BWAPI;
 using namespace Filter;
 
-MineContainer mines;
 WorkerContainer workers;
+MineContainer mines;
 ResourceDepotContainer resourcedepots;
 
 void ExampleAIModule::onStart()
@@ -89,9 +89,10 @@ void ExampleAIModule::onFrame()
         return;
 
     gatherer.AssignMine(workers.unit_set, mines.unit_set);
-
     workers.OnFrame();
     resourcedepots.OnFrame();
+
+    if (Broodwar->getFrameCount() >= 8000) Broodwar->leaveGame();
     // Don't put mines.OnFrame() here
 
 }
@@ -169,11 +170,9 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
         }
     }
     else {
-        if (unit->getPlayer() == Broodwar->self()) {
-            workers.Insert(unit);
-            resourcedepots.Insert(unit);
-            mines.Insert(unit);
-        }
+        workers.Insert(unit);
+        resourcedepots.Insert(unit);
+        mines.Insert(unit);
     }
 }
 

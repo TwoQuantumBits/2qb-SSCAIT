@@ -5,9 +5,9 @@ using namespace Filter;
 
 class UnitContainer {
 public:
-	std::vector<Unit> unit_vector;
+    std::unordered_set<Unit> unit_set;
     void OnFrame() {
-        for (Unit u : unit_vector) {
+        for (Unit u : unit_set) {
             // Ignore the unit if it no longer exists
             // Make sure to include this block when handling any Unit pointer!
             if (!u->exists())
@@ -28,16 +28,27 @@ public:
             PerformTask(u);
         }
     }
+    void Insert(Unit unit) {
+        if (CheckType(unit)) unit_set.insert(unit);
+    }
+    void Remove(Unit unit) {
+        auto found = unit_set.find(unit);
+        if (found != unit_set.end()) unit_set.erase(found);
+    }
 protected:
-    virtual void Insert(Unit unit) = 0;
+    virtual bool CheckType(Unit unit) = 0;
     virtual void PerformTask(Unit u) = 0;
+};
+
+class MineContainer : public UnitContainer {
+public:
+    bool CheckType(Unit unit) override { return (unit->getType().isMineralField() || unit->getType().isRefinery()); }
+    void PerformTask(Unit u) override {}; // No task to perform
 };
 
 class WorkerContainer : public UnitContainer {
 public:
-    void Insert(Unit unit) override {
-        if (unit->getType().isWorker()) unit_vector.push_back(unit);
-    }
+    bool CheckType(Unit unit) override { return unit->getType().isWorker(); }
 private:
     void PerformTask(Unit u) override {
         // if our worker is idle
@@ -47,16 +58,12 @@ private:
             // otherwise find a mineral patch to harvest.
             if (u->isCarryingGas() || u->isCarryingMinerals())
             {
+                gatherer.DoneGathering(u);
                 u->returnCargo();
             }
             else if (!u->getPowerUp())  // The worker cannot harvest anything if it
             {                             // is carrying a powerup such as a flag
-              // Harvest from the nearest mineral patch or gas refinery
-                if (!u->gather(u->getClosestUnit(IsMineralField || IsRefinery)))
-                {
-                    // If the call fails, then print the last error message
-                    Broodwar << Broodwar->getLastError() << std::endl;
-                }
+                gatherer.Gather(u);
 
             } // closure: has no powerup
         } // closure: if idle
@@ -65,9 +72,7 @@ private:
 
 class ResourceDepotContainer : public UnitContainer {
 public:
-    void Insert(Unit unit) {
-        if (unit->getType().isResourceDepot()) unit_vector.push_back(unit);
-    }
+    bool CheckType(Unit unit) { return unit->getType().isResourceDepot(); }
 private:
     void PerformTask(Unit u) {
         // Order the depot to construct more workers! But only when it is idle.

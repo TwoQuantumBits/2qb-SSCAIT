@@ -1,10 +1,15 @@
 #include "2qb-SSCAIT.h"
+#include "mine-gather.h"
+
+MineGather gatherer;
+
 #include "unit-container.h"
 #include <iostream>
 
 using namespace BWAPI;
 using namespace Filter;
 
+MineContainer mines;
 WorkerContainer workers;
 ResourceDepotContainer resourcedepots;
 
@@ -83,8 +88,12 @@ void ExampleAIModule::onFrame()
     if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
         return;
 
+    gatherer.AssignMine(workers.unit_set, mines.unit_set);
+
     workers.OnFrame();
     resourcedepots.OnFrame();
+    // Don't put mines.OnFrame() here
+
 }
 
 void ExampleAIModule::onSendText(std::string text)
@@ -163,12 +172,16 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
         if (unit->getPlayer() == Broodwar->self()) {
             workers.Insert(unit);
             resourcedepots.Insert(unit);
+            mines.Insert(unit);
         }
     }
 }
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
+    workers.Remove(unit);
+    resourcedepots.Remove(unit);
+    mines.Remove(unit);
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)

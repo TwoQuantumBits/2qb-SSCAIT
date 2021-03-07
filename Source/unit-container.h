@@ -41,36 +41,6 @@ protected:
     virtual void PerformTask(Unit u) = 0;
 };
 
-class MineContainer : public UnitContainer {
-public:
-    bool CheckType(Unit unit) override { return (unit->getType().isMineralField() || unit->getType().isRefinery()); }
-    void PerformTask(Unit u) override {}; // No task to perform
-};
-
-class WorkerContainer : public UnitContainer {
-public:
-    bool CheckType(Unit unit) override { return (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()); }
-private:
-    void PerformTask(Unit u) override {
-        // if our worker is idle
-        if (u->isIdle())
-        {
-            // Order workers carrying a resource to return them to the center,
-            // otherwise find a mineral patch to harvest.
-            if (u->isCarryingGas() || u->isCarryingMinerals())
-            {
-                u->returnCargo();
-                //gatherer.DoneGathering(u);
-            }
-            else if (!u->getPowerUp())  // The worker cannot harvest anything if it
-            {                             // is carrying a powerup such as a flag
-                //u->gather(u->getClosestUnit(IsMineralField || IsRefinery));
-                gatherer.Gather(u);
-            } // closure: has no powerup
-        } // closure: if idle
-    }
-};
-
 class ResourceDepotContainer : public UnitContainer {
 public:
     bool CheckType(Unit unit) { return (unit->getType().isResourceDepot() && unit->getPlayer() == Broodwar->self()); }

@@ -9,17 +9,15 @@ MineGather gatherer;
 using namespace BWAPI;
 using namespace Filter;
 
-WorkerContainer workers;
-MineContainer mines;
 ResourceDepotContainer resourcedepots;
 
 void ExampleAIModule::onStart()
 {
     // Hello World!
-    Broodwar->sendText("Hello world from team 2QB!");
+    // Broodwar->sendText("Hello world from team 2QB!");
 
     // Speed up the game
-    Broodwar->setLocalSpeed(0);
+    // Broodwar->setLocalSpeed(0);
 
     // Print the map name.
     // BWAPI returns std::string when retrieving a string, don't forget to add .c_str() when printing!
@@ -58,6 +56,10 @@ void ExampleAIModule::onStart()
         // If you wish to deal with multiple enemies then you must use enemies().
         if (Broodwar->enemy()) // First make sure there is an enemy
             Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
+
+        for (auto& u : Broodwar->getAllUnits()) {
+            onUnitCreate(u);
+        }
     }
 
 }
@@ -88,12 +90,12 @@ void ExampleAIModule::onFrame()
     if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
         return;
 
-    gatherer.AssignMine(workers.unit_set, mines.unit_set);
-    workers.OnFrame();
     resourcedepots.OnFrame();
 
     if (Broodwar->getFrameCount() >= 8000) Broodwar->leaveGame();
     // Don't put mines.OnFrame() here
+
+    gatherer.OnFrame();
 
 }
 
@@ -170,17 +172,15 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
         }
     }
     else {
-        workers.Insert(unit);
         resourcedepots.Insert(unit);
-        mines.Insert(unit);
+        gatherer.Insert(unit);
     }
 }
 
 void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 {
-    workers.Remove(unit);
     resourcedepots.Remove(unit);
-    mines.Remove(unit);
+    gatherer.Remove(unit);
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)

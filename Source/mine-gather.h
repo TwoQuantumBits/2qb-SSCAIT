@@ -14,33 +14,71 @@ public:
 		auto found = distribution.find(unit);
 		if (found == distribution.end()) return;
 		worker_count[found->second]--;
-		distribution.erase(found);
+		AssignMine(unit);
 	}
-	void AssignMine(std::unordered_set<Unit> wk, std::unordered_set<Unit> mn) {
-        for (Unit unit : wk) {
-            if (distribution.find(unit) != distribution.end()) continue;
-            int min_worker = -1;
-            for (Unit mine : mn) {
-                int count = worker_count[mine];
-                if (min_worker == -1 || count < min_worker) min_worker = count;
-            }
-            Unit choose = unit;
-            int min_dist = -1;
-            for (Unit mine : mn) {
-                if (worker_count[mine] != min_worker) continue;
-
-                int dist = unit->getDistance(mine);
-                if (min_dist == -1 || dist < min_dist) {
-                    min_dist = dist;
-                    choose = mine;
-                }
-            }
-            if (choose == unit) continue;
-            worker_count[choose]++;
-            distribution[unit] = choose;
-        }
+	void Remove(Unit unit) {
+		auto found = distribution.find(unit);
+		if (found != distribution.end()) distribution.erase(found);
+		auto found1 = worker_count.find(unit);
+		if (found1 != worker_count.end()) worker_count.erase(found1);
 	}
-    void Gather(Unit unit) {
-        unit->gather(distribution[unit]);
+    void Insert(Unit unit) {
+		if (unit->getType().isWorker() && unit->getPlayer() == Broodwar->self()) {
+			AssignMine(unit);
+		}
+		else if (unit->getType().isMineralField() || unit->getType().isRefinery()) {
+			worker_count.insert({ unit, 0 });
+		}
     }
+	void AssignMine(Unit unit) {
+		auto found = distribution.find(unit);
+		if (found != distribution.end()) distribution.erase(found);
+		int min_worker = INT_MAX;
+		int min_dist = INT_MAX;
+		Unit choose = unit;
+		for (auto i : worker_count) min_worker = std::min(min_worker, i.second);
+		for (auto i : worker_count) {
+			if (i.second > min_worker) continue;
+
+			int dist = unit->getDistance(i.first);
+			if (min_dist > dist) {
+				min_dist = dist;
+				choose = i.first;
+			}
+		}
+		worker_count[choose]++;
+		if (choose != unit) distribution.insert({ unit, choose });
+	}
+	void Gather(Unit u) {
+		auto found = distribution.find(u);
+		if (found != distribution.end()) u->gather(found->second);
+		else AssignMine(u);
+	}
+	void OnFrame() {
+		
+		for (auto i : distribution) {
+			Unit u = i.first;
+			if (u->isIdle())
+			{
+				// Order workers carrying a resource to return them to the center,
+				// otherwise find a mineral patch to harvest.
+				if (u->isCarryingGas() || u->isCarryingMinerals())
+				{
+					u->returnCargo();
+					DoneGathering(u);
+				}
+				else if (!u->getPowerUp())  // The worker cannot harvest anything if it
+				{                             // is carrying a powerup such as a flag
+					Gather(u);
+				  // Harvest from the nearest mineral patch or gas refinery
+					//if (!u->gather(distribution[u]))
+					//{
+					//	// If the call fails, then print the last error message
+					//	Broodwar << "No fuck you, " << Broodwar->getLastError() << std::endl;
+					//}
+
+				} // closure: has no powerup
+			} // closure: if idle
+		}
+	}
 };

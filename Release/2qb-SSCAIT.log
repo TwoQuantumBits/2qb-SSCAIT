@@ -2,8 +2,8 @@
   2qb-SSCAIT.cpp
      Creating library Release\2qb-SSCAIT.lib and object Release\2qb-SSCAIT.exp
   Generating code
-  672 of 2844 functions (23.6%) were compiled, the rest were copied from previous compilation.
-    242 functions were new in current compilation
-    168 functions had inline decision re-evaluated but remain unchanged
+  1 of 2872 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   2qb-SSCAIT.vcxproj -> C:\Users\Zap\BWAPI\Release\2qb-SSCAIT.dll
